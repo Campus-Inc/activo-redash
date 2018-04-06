@@ -5,12 +5,14 @@
 
 ```bash
 # initialize
-sudo docker-compose run --rm server create_db
+$ docker-compose run --rm server create_db
 ```
 
 ### 起動
 ```bash
-sudo docker-compose up
+$ docker-compose up
+# or
+# $ docker-compose up -d
 ```
 
 ## Warning
