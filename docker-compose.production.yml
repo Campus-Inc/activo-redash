@@ -7,13 +7,13 @@
 version: '3'
 services:
   server:
-    image: redash/redash:4.0.0rc.1
+    image: redash/redash:latest
     command: server
     depends_on:
       - postgres
       - redis
-    expose:
-      - "80"
+    ports:
+      - "5000:5000"
     environment:
       PYTHONUNBUFFERED: 0
       REDASH_LOG_LEVEL: "INFO"
@@ -23,7 +23,7 @@ services:
       REDASH_WEB_WORKERS: 4
     restart: always
   worker:
-    image: redash/redash:4.0.0rc.1
+    image: redash/redash:latest
     command: scheduler
     environment:
       PYTHONUNBUFFERED: 0

@@ -1,34 +1,30 @@
 # This configuration file is for **development** setup. For production, refer to
 # docker-compose.production.yml.
-version: '2'
+version: '3'
 services:
   server:
     build:
       context: .
-      dockerfile: Dockerfile.web
-    command: server
+      dockerfile: Dockerfile.server
+    command: dev_server
     depends_on:
       - postgres
       - redis
     ports:
-      - "80:5000"
+      - "5000:5000"
     volumes:
-      - ".:/app"
+      - server:/app
     environment:
-      PORT: 5000
       PYTHONUNBUFFERED: 0
       REDASH_LOG_LEVEL: "INFO"
       REDASH_REDIS_URL: "redis://redis:6379/0"
       REDASH_DATABASE_URL: "postgresql://postgres@postgres/postgres"
-      REDASH_COOKIE_SECRET: veryverysecret
-      REDASH_WEB_WORKERS: 4
-
   worker:
     build:
       context: .
       dockerfile: Dockerfile.worker
     command: scheduler
-    volumes_from:
+    volumes:
       - server
     depends_on:
       - server
@@ -41,11 +37,11 @@ services:
       WORKERS_COUNT: 2
   redis:
     image: redis:3.0-alpine
-    restart: unless-stopped
+    restart: always
   postgres:
     image: postgres:9.5.6-alpine
-    # The following turns the DB into less durable, but gains significant performance improvements for the tests run (x3
-    # improvement on my personal machine). We should consider moving this into a dedicated Docker Compose configuration for
-    # tests.
-    command: "postgres -c fsync=off -c full_page_writes=off -c synchronous_commit=OFF"
-    restart: unless-stopped
+    volumes:
+      - /opt/postgres-data:/var/lib/postgresql/data
+    restart: always
+volumes:
+  server:
